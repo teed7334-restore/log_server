@@ -1,0 +1,59 @@
+version: '3'
+services:
+  elasticsearch: 
+    image: 'docker.elastic.co/elasticsearch/elasticsearch:7.5.0'
+    container_name: 'elasticsearch'
+    networks:
+      - log-networks
+    ports: 
+      -  0.0.0.0:9200:9200
+      -  0.0.0.0:9300:9300
+    volumes:
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
+      - ./elasticsearch/config:/usr/share/elasticsearch/config
+    environment:
+      - discovery.type=single-node
+    restart: always
+  kibana:
+    image: 'docker.elastic.co/kibana/kibana:7.5.0'
+    container_name: 'kibana'
+    networks:
+      - log-networks
+    depends_on:
+      - elasticsearch
+    ports:
+      - 0.0.0.0:5601:5601
+    volumes:
+      - ./kibana/config:/usr/share/kibana/config
+    restart: always
+  filebeat:
+    image: 'docker.elastic.co/beats/filebeat:7.5.0'
+    container_name: 'filebeat'
+    networks:
+      - log-networks
+    volumes: 
+      - /opt/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - /opt/filebeat/data:/usr/share/filebeat/data
+      - /opt/filebeat/logs:/usr/share/filebeat/logs
+      - /var/log:/log/local
+    depends_on:
+      - elasticsearch
+      - logstash
+    restart: always
+  logstash:
+    image: 'docker.elastic.co/logstash/logstash:7.5.0'
+    container_name: 'logstash'
+    networks:
+      - log-networks
+    ports:
+      - 0.0.0.0:5044:5044
+    volumes:
+      - /opt/logstash/config:/usr/share/logstash/config
+      - /opt/logstash/pipeline:/usr/share/logstash/pipeline
+    depends_on:
+      - elasticsearch
+    restart: always
+networks: 
+  log-networks:
+    driver: bridge
+    

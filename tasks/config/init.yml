@@ -1,0 +1,59 @@
+---
+  - name: "複製Docker-Compose.yml到遠端機器"
+    copy:
+      src: ./resources/docker/docker-compose.yml
+      dest: /opt/docker-compose.yml
+      owner: root
+      group: root
+      follow: yes
+      mode: "644"
+  - name: "複製Docker環境變數到遠端機器"
+    copy:
+      src: ./resources/docker/.env
+      dest: /opt/.env
+      owner: root
+      group: root
+      follow: yes
+      mode: "644"
+  - name: "複製運行Elasticsearch所需資料"
+    unarchive:
+      src: ./resources/elasticsearch.tar.gz
+      dest: /opt
+  - name: "設定Elasticsearch資料夾權限"
+    file:
+      path: /opt/elasticsearch/data
+      mode: "777"
+      owner: root
+      group: root
+      recurse: yes
+  - name: "複製運行Filebeat所需資料"
+    unarchive:
+      src: ./resources/filebeat.tar.gz
+      dest: /opt
+  - name: "設定Filebeat資料夾權限"
+    file:
+      path: /opt/filebeat/data
+      mode: "777"
+      owner: root
+      group: root
+      recurse: yes
+  - name: "設定Filebeat資料夾權限"
+    file:
+      path: /opt/filebeat/logs
+      mode: "777"
+      owner: root
+      group: root
+      recurse: yes
+  - name: "複製運行Kibana所需資料"
+    unarchive:
+      src: ./resources/kibana.tar.gz
+      dest: /opt
+  - name: "複製運行Logstash所需資料"
+    unarchive:
+      src: ./resources/logstash.tar.gz
+      dest: /opt
+  - name: "運行Docker-Compose"
+    shell: "docker-compose -f /opt/docker-compose.yml up -d --build"
+    args:
+      executable: /bin/bash
+  

@@ -1,0 +1,16 @@
+---
+- hosts: log
+  remote_user: petercheng
+  become: yes
+  tasks:
+    # 初始化系統
+    - name: "全系統更新"
+      include_tasks: tasks/install/init.yml
+
+    # 安裝Docker
+    - name: "安裝Docker"
+      include_tasks: tasks/install/docker.yml
+
+    # 安裝Docker-Compose
+    - name: "安裝Docker"
+      include_tasks: tasks/install/docker-compose.yml

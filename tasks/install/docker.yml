@@ -1,0 +1,44 @@
+---
+  #宣告變數
+  - shell: echo $(lsb_release -cs)
+    register: release_name
+  
+  #安裝Docker
+  - name: "移除舊版Docker"
+    apt:
+      pkg:
+        - docker
+        - docker-engine
+        - docker.io
+        - containerd
+        - runc
+        - docker-ce
+      purge: yes
+      state: absent
+  - name: "安裝下載Docker所需之相依性套件"
+    apt:
+      pkg: 
+        - apt-transport-https 
+        - ca-certificates 
+        - curl 
+        - gnupg-agent 
+        - software-properties-common
+      state: present
+      update_cache: yes
+  - name: "下載安裝Docker所需之套件庫GPG Key"
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+  - name: "下載Docker套件庫來源"
+    apt_repository:
+      repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ release_name.stdout }} stable
+      state: present
+      filename: docker.list
+  - name: "安裝Docker"
+    apt:
+      pkg: 
+        - docker-ce 
+        - docker-ce-cli 
+        - containerd.io
+      state: present
+      update_cache: yes

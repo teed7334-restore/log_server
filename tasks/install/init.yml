@@ -1,0 +1,6 @@
+---
+
+# 初始化系統
+- name: "全系統更新"
+  apt: 
+    upgrade: dist

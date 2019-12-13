@@ -1,0 +1,8 @@
+---
+- hosts: log
+  remote_user: petercheng
+  become: yes
+  tasks:
+    # 初始化系統
+    - name: "設定系統參數"
+      include_tasks: tasks/config/init.yml
